@@ -1,28 +1,77 @@
+/* eslint-disable react/prop-types */
+
+
 import { useState } from 'react'
 
 function App() {
+
   const [currentStep, setCurrentStep] = useState(1);
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleNext = () => {
+  const handleSubmit = event => {
+    event.preventDefault();
+    alert(`Your registration detail: \n
+        Email: ${email} \n
+        Username: ${username} \n
+        Password: ${password}`);
+    
+    // Functions to reset the form
+    setEmail('');
+    setUsername('');
+    setPassword('');
+    setCurrentStep(1);
+
+  };
+
+  const handleChange = event => {
+    const {name, value} = event.target;
+
+    switch (name) {
+      case 'email':
+        setEmail(value);
+        break;
+      case 'username':
+        setUsername(value);
+        break;
+      case 'password':
+        setPassword(value);
+        break;
+    }
+  };
+
+  const nextButton = () => {
     if (currentStep < 3) {
-      setCurrentStep(currentStep + 1);
+      return (
+        <button 
+          className='btn btn-next f-right'
+          type='button'
+          onClick={() => setCurrentStep(prevStep => prevStep + 1)}
+        >
+          Next
+        </button>
+      );
     }
+    return null;
   };
 
-  const handlePrev = () => {
+
+  const prevButton = () => {
     if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
+      return (
+        <button
+          className='btn btn-prev'
+          type='button'
+          onClick={() => setCurrentStep(prevStep => prevStep - 1)}
+        >
+          Previous
+        </button>
+      );
     }
+    return null;
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    alert(`Email: ${email}\nUsername: ${username}\nPassword: ${password}`);
-  };
-  
 
   return (
     <>
@@ -30,39 +79,36 @@ function App() {
         <h1>React Wizard Form</h1>
         <p>Step {currentStep}</p>
         
-        <form onSubmit={handleSubmit}>
-          {currentStep === 1 && (
-            <Step1 email={email} setEmail={setEmail} />
-          )}
-          {currentStep === 2 && (
-            <Step2 username={username} setUsername={setUsername} />
-          )}
-          {currentStep === 3 && (
-            <Step3 password={password} setPassword={setPassword} />
-          )}
+       <form onSubmit={handleSubmit}>
+        <Step1 
+          currentStep={currentStep} 
+          handleChange={handleChange}
+          email={email}
+        />
+        <Step2 
+          currentStep={currentStep} 
+          handleChange={handleChange}
+          username={username}
+        />
+        <Step3 
+          currentStep={currentStep} 
+          handleChange={handleChange}
+          password={password}
+        />
+        {nextButton()}
+        {prevButton()}
 
-          <div style={{ margin: '20px' }}>
-            {currentStep > 1 && (
-              <button type="button" onClick={handlePrev}>
-                Previous
-              </button>
-            )}
-            {currentStep < 3 && (
-              <button type="button" onClick={handleNext}>
-                Next
-              </button>
-            )}
-            {currentStep === 3 && (
-              <button type="submit">Submit</button>
-            )}
-          </div>
-        </form>
+       </form>
       </div>
     </>
   );
 }
 
-function Step1({ email, setEmail }) {
+function Step1(props) {
+  if (props.currentStep !== 1) {
+    return null;
+  }
+
   return (
     <div className='form-group'>
       <label htmlFor='email'>Email address</label>
@@ -72,15 +118,19 @@ function Step1({ email, setEmail }) {
         name='email'
         type='text'
         placeholder='Enter email'
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
+        value={props.email}
+        onChange={props.handleChange}
       />
     </div>
   );
 }
 
 
-function Step2({username, setUsername}) {
+function Step2(props) {
+  if (props.currentStep !== 2) {
+    return null;
+  }
+
   return (
     <div className='form-group'>
       <label htmlFor='username'>Username</label>
@@ -90,28 +140,37 @@ function Step2({username, setUsername}) {
         name='username'
         type='text'
         placeholder='Enter username'
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
+        value={props.username}
+        onChange={props.handleChange}
       />
     </div>
   );
 }
 
-function Step3({password, setPassword}) {
+function Step3(props) {
+  if (props.currentStep !== 3) {
+    return null;
+  }
+
+
   return (
-    <div className='form-group'>
-      <label htmlFor='password'>Password</label>
-      <input
-        className='form-control'
-        id='password'
-        name='password'
-        type='password'
-        placeholder='Enter password'
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
-    </div>
-  );
+    <>
+      <div className='form-group'>
+       <label htmlFor='password'>Password</label>
+       <input
+         className='form-control'
+         id='password'
+         name='password'
+         type='password'
+         placeholder='Enter password'
+         value={props.password}
+         onChange={props.handleChange}
+       />
+      </div>
+      <button className='btn btn-submit f-right'>Sign up</button>
+    
+    </>
+ );
 }
 
 
